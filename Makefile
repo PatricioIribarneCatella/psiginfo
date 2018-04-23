@@ -9,7 +9,7 @@ all:
 run: all
 	./$(EXEC) $(PID)
 
-clean: $(EXEC)
+clean:
 	rm -f $(EXEC)
 
 .PHONY: clean run
