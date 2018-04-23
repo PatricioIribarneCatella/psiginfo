@@ -20,6 +20,8 @@ static void psiginfo(int pid) {
 	}
 
 	/* Search in the file for "Sig* lines"*/
+
+	close(fd);
 }
 
 int main(int arg, char const* argv[]) {
