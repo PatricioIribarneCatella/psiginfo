@@ -4,6 +4,9 @@
 #include <unistd.h>
 
 #define BUFLEN 128
+static char blk_sigs[BUFLEN];
+static char ign_sigs[BUFLEN];
+static char cgt_sigs[BUFLEN];
 
 static void print_signal_status(const char* title, const char* sig_bitmask) {
 
@@ -13,12 +16,14 @@ static void print_signal_status(const char* title, const char* sig_bitmask) {
 
 static void find_signal_info(FILE* file) {
 
-	static char blk_sigs[BUFLEN];
-	static char ign_sigs[BUFLEN];
-	static char cgt_sigs[BUFLEN];
+	char buf[BUFLEN] = {0};
 
-	fscanf(file, "SigBlk: %s\nSigIgn: %s\nSigCgt: %s\n",
-		blk_sigs, ign_sigs, cgt_sigs);
+	while (fgets(buf, sizeof buf, file) != NULL) {
+		
+		sscanf(buf, "SigBlk:\t%s\n", blk_sigs);
+		sscanf(buf, "SigIgn:\t%s\n", ign_sigs);
+		sscanf(buf, "SigCgt:\t%s\n", cgt_sigs);
+	}
 
 	print_signal_status("Blocked Signals", blk_sigs);
 	print_signal_status("Ignored Signals", ign_sigs);
