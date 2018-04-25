@@ -8,22 +8,6 @@
 #include <sys/stat.h>
 
 #define BUFLEN 128
-#define PGSIZE 4096
-
-// Rounding operations (efficient when n is a power of 2)
-// Round down to the nearest multiple of n
-#define ROUNDDOWN(a, n)                                         \
-({                                                              \
-        uint32_t __a = (uint32_t) (a);                          \
-        (typeof(a)) (__a - __a % (n));                          \
-})
-
-// Round up to the nearest multiple of n
-#define ROUNDUP(a, n)                                           \
-({                                                              \
-        uint32_t __n = (uint32_t) (n);                          \
-        (typeof(a)) (ROUNDDOWN((uint32_t) (a) + __n - 1, __n)); \
-})
 
 static void print_signal_status(const char* title, const char* sig_bitmask) {
 
@@ -49,6 +33,7 @@ static void psiginfo(int pid) {
 
 	int fd;
 	char* file;
+	size_t len;
 	struct stat sb;
 	char buf[BUFLEN] = {0};
 
@@ -65,7 +50,9 @@ static void psiginfo(int pid) {
 		_exit(EXIT_FAILURE);
 	}
 
-	if ((file = mmap(NULL, ROUNDUP(sb.st_size, PGSIZE), PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED) {
+	len = sb.st_size & ~(sysconf(_SC_PAGE_SIZE) - 1);
+
+	if ((file = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED) {
 		perror("cannot map file ");
 		close(fd);
 		_exit(EXIT_FAILURE);
