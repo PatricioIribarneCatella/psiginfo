@@ -8,10 +8,30 @@ static char blk_sigs[BUFLEN];
 static char ign_sigs[BUFLEN];
 static char cgt_sigs[BUFLEN];
 
+struct Signal {
+	char* name;
+	unsigned int num;
+	unsigned long int hex_rep;
+};
+
+static struct Signal signals_hex_format[] = {
+	{"SIGHUP", 1, (1 << 0)},
+	{"SIGINT", 2, (1 << 1)},
+	{"SIGQUIT", 3, (1 << 2)},
+	{"SIGILL", 4, (1 << 3)},
+	{"SIGTRAP", 5, (1 << 4)},
+	{"SIGABRT", 6, (1 << 5)},
+	{"SIGBUS", 7, (1 << 6)},
+	{"SIGFPE", 8, (1 << 7)},
+	{"SIGKILL", 9, (1 << 8)},
+	{"SIGBUS", 10, (1 << 9)},
+	{"SIGSEGV", 11, (1 << 10)},
+};
+
 static void print_signal_status(const char* title, const char* sig_bitmask) {
 
 	printf("%s\n", title);
-	printf("\t%s\n", sig_bitmask);
+	printf("\t%lx\n", strtoul(sig_bitmask, NULL, 16));
 }
 
 static void find_signal_info(FILE* file) {
