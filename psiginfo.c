@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <unistd.h>
 
+#define SIGNALS 20
 #define BUFLEN 128
 static char blk_sigs[BUFLEN];
 static char ign_sigs[BUFLEN];
@@ -14,7 +15,7 @@ struct Signal {
 	unsigned long int hex_rep;
 };
 
-static struct Signal signals_hex_format[] = {
+static struct Signal signals_hex_format[SIGNALS] = {
 	{"SIGHUP", 1, (1 << 0)},
 	{"SIGINT", 2, (1 << 1)},
 	{"SIGQUIT", 3, (1 << 2)},
@@ -26,12 +27,31 @@ static struct Signal signals_hex_format[] = {
 	{"SIGKILL", 9, (1 << 8)},
 	{"SIGBUS", 10, (1 << 9)},
 	{"SIGSEGV", 11, (1 << 10)},
+	{"SIGUSR2", 12, (1 << 11)},
+	{"SIGPIPE", 13, (1 << 12)},
+	{"SIGALRM", 14, (1 << 13)},
+	{"SIGTERM", 15, (1 << 14)},
+	{"SIGUSR1", 16, (1 << 15)},
+	{"SIGUSR2", 17, (1 << 16)},
+	{"SIGCONT", 18, (1 << 17)},
+	{"SIGCONT", 19, (1 << 18)},
+	{"SIGTSTP", 20, (1 << 19)}
 };
 
 static void print_signal_status(const char* title, const char* sig_bitmask) {
 
-	printf("%s\n", title);
-	printf("\t%lx\n", strtoul(sig_bitmask, NULL, 16));
+	long unsigned int bit_mask = strtoul(sig_bitmask, NULL, 16);
+
+	printf("%s (Mask: %lx)\n", title, bit_mask);
+	
+	for (int i = 0; i < SIGNALS; i++) {
+		if (bit_mask & signals_hex_format[i].hex_rep)
+			printf("\t Name: %s (Number: %u)\n",
+				signals_hex_format[i].name,
+				signals_hex_format[i].num);
+	}
+
+	printf("\n");
 }
 
 static void find_signal_info(FILE* file) {
