@@ -5,17 +5,20 @@
 
 #define SIGNALS 20
 #define BUFLEN 128
+
+#define SIZE(X, Y) (sizeof(X)/sizeof(Y))
+
 static char blk_sigs[BUFLEN];
 static char ign_sigs[BUFLEN];
 static char cgt_sigs[BUFLEN];
 
-struct Signal {
+typedef struct {
 	char* name;
 	unsigned int num;
 	unsigned long int hex_rep;
-};
+} Signal;
 
-static struct Signal signals_hex_format[SIGNALS] = {
+static Signal sig_hex[] = {
 	{"SIGHUP", 1, (1 << 0)},
 	{"SIGINT", 2, (1 << 1)},
 	{"SIGQUIT", 3, (1 << 2)},
@@ -35,7 +38,18 @@ static struct Signal signals_hex_format[SIGNALS] = {
 	{"SIGUSR2", 17, (1 << 16)},
 	{"SIGCONT", 18, (1 << 17)},
 	{"SIGCONT", 19, (1 << 18)},
-	{"SIGTSTP", 20, (1 << 19)}
+	{"SIGTSTP", 20, (1 << 19)},
+	{"SIGTTIN", 21, (1 << 20)},
+	{"SIGTTOU", 22, (1 << 21)},
+	{"SIGSTOP", 23, (1 << 22)},
+	{"SIGTSTP", 24, (1 << 23)},
+	{"SIGCONT", 25, (1 << 24)},
+	{"SIGTTIN", 26, (1 << 25)},
+	{"SIGTTOU", 27, (1 << 26)},
+	{"SIGWINCH", 28, (1 << 27)},
+	{"SIGPROF", 29, (1 << 28)},
+	{"SIGUSR1", 30, (1 << 29)},
+	{"SIGUSR2", 31, (1 << 30)}
 };
 
 static void print_signal_status(const char* title, const char* sig_bitmask) {
@@ -44,11 +58,11 @@ static void print_signal_status(const char* title, const char* sig_bitmask) {
 
 	printf("%s (Mask: %lx)\n", title, bit_mask);
 	
-	for (int i = 0; i < SIGNALS; i++) {
-		if (bit_mask & signals_hex_format[i].hex_rep)
+	for (int i = 0; i < SIZE(sig_hex, Signal); i++) {
+		if (bit_mask & sig_hex[i].hex_rep)
 			printf("\t Name: %s (Number: %u)\n",
-				signals_hex_format[i].name,
-				signals_hex_format[i].num);
+				sig_hex[i].name,
+				sig_hex[i].num);
 	}
 
 	printf("\n");
