@@ -84,8 +84,34 @@ static void find_signal_info(FILE* file) {
 	print_signal_status("Caught Signals", cgt_sigs);
 }
 
-static void psiginfo(int pid) {
+static void print_cmd_info(int pid) {
 
+	FILE* f;
+	int i = 0, j = 1, k = 2;
+	char buf[BUFLEN] = {0};
+
+	snprintf(buf, sizeof buf, "/proc/%d/cmdline", pid);
+	
+	if (!(f = fopen(buf, "r"))) {
+		perror("cannot open file ");
+		_exit(EXIT_FAILURE);
+	}
+	
+	fgets(buf, sizeof buf, f);
+
+	while (buf[j] != '\0' || buf[k] != '\0') {
+		if (buf[i] == '\0')
+			buf[i] = ' ';
+		i++; j++; k++;
+	}
+
+	fclose(f);
+
+	printf("pid: %d (%s)\n\n", pid, buf);
+}
+
+static void print_signal_info(int pid) {
+	
 	FILE* f;
 	char buf[BUFLEN] = {0};
 
@@ -99,6 +125,12 @@ static void psiginfo(int pid) {
 	find_signal_info(f);
 
 	fclose(f);
+}
+
+static void psiginfo(int pid) {
+
+	print_cmd_info(pid);
+	print_signal_info(pid);
 }
 
 int main(int arg, char const* argv[]) {
