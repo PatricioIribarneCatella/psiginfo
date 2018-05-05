@@ -18,6 +18,7 @@ typedef struct {
 	unsigned long long int hex_rep;
 } Signal;
 
+// signals hexdacimal representation
 static Signal sig_hex[] = {
 	{"SIGHUP", 1, (1ULL << 0)},
 	{"SIGINT", 2, (1ULL << 1)},
@@ -83,6 +84,8 @@ static Signal sig_hex[] = {
 	{"SIGRTMAX", 64, (1ULL << 63)}
 };
 
+// prints signals information in a
+// human friendly way
 static void print_signal_status(const char* title, const char* sig_bitmask) {
 
 	long unsigned int bit_mask = strtoul(sig_bitmask, NULL, 16);
@@ -99,6 +102,8 @@ static void print_signal_status(const char* title, const char* sig_bitmask) {
 	printf("\n");
 }
 
+// finds signal status information
+// within the file
 static void find_signal_info(FILE* file) {
 
 	char buf[BUFLEN] = {0};
@@ -115,6 +120,27 @@ static void find_signal_info(FILE* file) {
 	print_signal_status("Caught Signals", cgt_sigs);
 }
 
+// reads and searches for signals status
+// information in the /proc/[pid]/status file
+static void print_signal_info(int pid) {
+	
+	FILE* f;
+	char buf[BUFLEN] = {0};
+
+	snprintf(buf, sizeof buf, "/proc/%d/status", pid);
+
+	if (!(f = fopen(buf, "r"))) {
+		perror("cannot open file ");
+		_exit(EXIT_FAILURE);
+	}
+	
+	find_signal_info(f);
+
+	fclose(f);
+}
+
+// prints information about the
+// process command corresponding to 'pid'
 static void print_cmd_info(int pid) {
 
 	FILE* f;
@@ -139,23 +165,6 @@ static void print_cmd_info(int pid) {
 	fclose(f);
 
 	printf("pid: %d (%s)\n\n", pid, buf);
-}
-
-static void print_signal_info(int pid) {
-	
-	FILE* f;
-	char buf[BUFLEN] = {0};
-
-	snprintf(buf, sizeof buf, "/proc/%d/status", pid);
-
-	if (!(f = fopen(buf, "r"))) {
-		perror("cannot open file ");
-		_exit(EXIT_FAILURE);
-	}
-	
-	find_signal_info(f);
-
-	fclose(f);
 }
 
 static void psiginfo(int pid) {
