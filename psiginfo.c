@@ -6,7 +6,7 @@
 #define SIGNALS 20
 #define BUFLEN 128
 
-#define SIZE(X, Y) (sizeof(X)/sizeof(Y))
+#define SIZEOF(X) (sizeof(X)/sizeof(*X))
 
 static char blk_sigs[BUFLEN];
 static char ign_sigs[BUFLEN];
@@ -58,7 +58,7 @@ static void print_signal_status(const char* title, const char* sig_bitmask) {
 
 	printf("%s (Mask: %lx)\n", title, bit_mask);
 	
-	for (int i = 0; i < SIZE(sig_hex, Signal); i++) {
+	for (int i = 0; i < SIZEOF(sig_hex); i++) {
 		if (bit_mask & sig_hex[i].hex_rep)
 			printf("\t Name: %s (Number: %u)\n",
 				sig_hex[i].name,
