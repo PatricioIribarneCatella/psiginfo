@@ -1,15 +1,29 @@
-CC  := gcc
-CFLAGS := -Wall -std=c99 -g
-EXEC := psiginfo
-PID := 1
+CFLAGS := -std=c99 -g -Wall
+CC := gcc
+EXEC = main
+BIN = $(filter-out $(EXEC).c, $(wildcard *.c))
+BINFILES = $(BIN:.c=.o)
+OBJDIR = build
+PID =
 
-all:
-	$(CC) $(CFLAGS) $(EXEC).c -o $(EXEC)
+$(OBJDIR)/%.o: %.c %.h
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+OBJEXEC = $(addprefix $(OBJDIR)/, $(EXEC))
+
+all: $(OBJEXEC)
+
+$(OBJEXEC): $(addprefix $(OBJDIR)/, $(BINFILES)) $(EXEC).c
+	$(CC) $(CFLAGS) $^ -o $@
 
 run: all
-	./$(EXEC) $(PID)
+	./$(OBJDIR)/$(EXEC) $(PID)
+
+valgrind: all
+	valgrind --leak-check=full --show-leak-kinds=all ./$(OBJDIR)/$(EXEC)
 
 clean:
-	rm -f $(EXEC)
+	rm -rf $(OBJDIR)/ *.o *.asm
 
 .PHONY: clean run

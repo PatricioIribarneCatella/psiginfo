@@ -1,22 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <unistd.h>
-
-#define SIGNALS 20
-#define BUFLEN 128
-
-#define LENGHT(X) (sizeof(X)/sizeof(*X))
+#include "psiginfo.h"
 
 static char blk_sigs[BUFLEN];
 static char ign_sigs[BUFLEN];
 static char cgt_sigs[BUFLEN];
-
-typedef struct {
-	char* name;
-	unsigned int num;
-	unsigned long long int hex_rep;
-} Signal;
 
 // signals hexdacimal representation
 static Signal sig_hex[] = {
@@ -167,18 +153,11 @@ static void print_cmd_info(int pid) {
 	printf("pid: %d (%s)\n\n", pid, buf);
 }
 
-static void psiginfo(int pid) {
+// prints information about
+// process´ signals status
+void psiginfo(int pid) {
 
 	print_cmd_info(pid);
 	print_signal_info(pid);
 }
 
-int main(int arg, char const* argv[]) {
-
-	// it must contains the pid
-	assert(arg == 2);
-
-	psiginfo(atoi(argv[1]));
-
-	return 0;
-}
