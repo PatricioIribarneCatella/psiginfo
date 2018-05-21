@@ -125,13 +125,14 @@ static void print_signal_info(int pid) {
 	fclose(f);
 }
 
-// prints information about the
-// process command corresponding to 'pid'
-static void print_cmd_info(int pid) {
+// prints command line
+// representation of the process
+void print_cmdline_info(int pid) {
 
 	FILE* f;
 	int i = 0, j = 1, k = 2;
 	char buf[BUFLEN] = {0};
+	char* r;
 
 	snprintf(buf, sizeof buf, "/proc/%d/cmdline", pid);
 	
@@ -140,7 +141,13 @@ static void print_cmd_info(int pid) {
 		_exit(EXIT_FAILURE);
 	}
 	
-	fgets(buf, sizeof buf, f);
+	memset(buf, 0, sizeof buf);
+	r = fgets(buf, sizeof buf, f);
+
+	fclose(f);
+
+	if (!r)
+		return;
 
 	while (buf[j] != '\0' || buf[k] != '\0') {
 		if (buf[i] == '\0')
@@ -148,9 +155,39 @@ static void print_cmd_info(int pid) {
 		i++; j++; k++;
 	}
 
+	printf("cmdline name: %s\n\n", buf);
+}
+
+// prints what /proc/[pid]/comm
+// holds in (the command name)
+void print_comm_info(int pid) {
+
+	FILE* f;
+	char buf[BUFLEN] = {0};
+
+	snprintf(buf, sizeof buf, "/proc/%d/comm", pid);
+	
+	if (!(f = fopen(buf, "r"))) {
+		perror("cannot open file ");
+		_exit(EXIT_FAILURE);
+	}
+	
+	memset(buf, 0, sizeof buf);
+	fgets(buf, sizeof buf, f);
+
 	fclose(f);
 
-	printf("pid: %d (%s)\n\n", pid, buf);
+	printf("name: %s", buf);
+}
+
+// prints information about the
+// process´ command corresponding to 'pid'
+static void print_cmd_info(int pid) {
+
+	printf("pid: %d\n", pid);
+
+	print_comm_info(pid);
+	print_cmdline_info(pid);
 }
 
 // prints information about
